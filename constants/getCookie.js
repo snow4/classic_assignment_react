@@ -1,1 +1,0 @@
-export const cookie = document.cookie.split(";").map(m => m.split('=')).reduce((accumulator, [key,value]) => ({...accumulator, [key.trim()]: decodeURIComponent(value)}),{});

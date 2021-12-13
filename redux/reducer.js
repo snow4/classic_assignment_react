@@ -1,36 +1,26 @@
-import ActionTypes from "./actionTypes";
-import initialState from "./initialState";
+import ActionTypes from './actionTypes'
+import initialState from './initialState'
 
-export default (state = initialState.modal, action) => {
-  console.log("action in reducer", action,"initial state",state);
+export default (state = initialState, action) => {
+  console.log('action in reducer', action, 'initial state', state)
   switch (action.type) {
-    case ActionTypes.AUTH_DATA:
+    case ActionTypes.SEARCH_RESULT:
       return {
         ...state,
-        authData: action.payload,
-        isLoggedIn:true
-      };
-    case ActionTypes.LOGOUT:
+        searchResult: action.payload,
+      }
+    case ActionTypes.NEWS_RESULT:
       return {
-         ...state,
-         isLoggedIn: action.payload,
-      };
-    case ActionTypes.CHECK_AUTHENTICATION:
+        ...state,
+        newsResult: action.payload,
+      }
+    case ActionTypes.SPINNER: {
       return {
-          ...state,
-          isLoggedIn: action.payload,
-      };
-    case ActionTypes.CREATE_NOTE:
-      return {
-          ...state,
-        lists: action.payload,
-      };
-    case ActionTypes.GET_ALL_LIST_OF_EMAIL:
-      return {
-          ...state,
-        lists: action.payload.result,
-      };
+        ...state,
+        spinner: action.payload,
+      }
+    }
     default:
-      return state;
+      return state
   }
-};
+}

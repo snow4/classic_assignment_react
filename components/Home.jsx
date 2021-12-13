@@ -1,76 +1,114 @@
 import React, { Component } from 'react'
-import Header from "../hoc/header"
-import styled from "styled-components"
-import { Button, Radio } from 'antd';
-import { connect } from "react-redux";
-import {getAllLists } from "../actions/asyncActions"
+import styled from 'styled-components'
+import { SearchQuery } from '../actions/asyncActions'
+import { connect } from 'react-redux'
+import SearchCard from '../components/hoc/searchCard'
+import { Empty } from 'antd'
+
 const Wrapper = styled.div``
-
 const Container = styled.div`
-background: #fff;
-width: 100%;
-margin: 3em 0 0 5em;;
-padding:1em 3em 3em 3em;
-`
-const Notes = styled.div`
-display:flex;
+  margin: 5em 0 5em 0;
 
-> div{
-    border: 2px solid #eee;
-    padding:1em;
-    display:flex;
-    flex-direction:column;
-    width:100%;
-}
+  @media only screen and (max-width: 414px) {
+    text-align-last: center;
+  }
 
+  @media only screen and (max-width: 768px) {
+    text-align-last: center;
+  }
 `
-const Title = styled.div`
-font-weight:800;
+
+const Search = styled.input`
+  width: 40em;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border-radius: 20px;
+
+  @media only screen and (max-width: 800px) {
+    width: 20em;
+  }
+  @media only screen and (max-width: 400px) {
+    width: 15em;
+  }
 `
-const Description = styled.div``
+const Button = styled.button`
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border-radius: 30px;
+  cursor: pointer;
+`
+
+const SearchContainer = styled.div`
+  > div {
+    margin-bottom: 4em;
+  }
+
+  > h2 {
+    text-align: center;
+  }
+`
 
 class Home extends Component {
-
-    componentDidMount = () =>{
-        const {email} = this.props.auth_data;
-        // console.log("email in home", email);
-        getAllLists({email})
+  state = {
+    searchquery: '',
+    data: {
+      title: 'Snow - Wikipedia',
+      link: 'https://en.wikipedia.org/wiki/Snow',
+      displayed_link: 'https://en.wikipedia.org › wiki › Snow',
+      snippet:
+        'Snow comprises individual ice crystals that grow while suspended in the atmosphere—usually within clouds—and then fall, accumulating on the ground where ...',
+    },
+  }
+  searchHandler = (e) => {
+    this.setState({ searchquery: e.target.value })
+  }
+  submitHandler = () => {
+    if (this.state.searchquery != '') {
+      SearchQuery(this.state.searchquery)
+    } else {
+      alert('please enter search query')
     }
+  }
 
-    render() {
-        // const notes= this.props.allNotes
-        return (
-            <div>
-                <Header/>
-                <Container>
-                <h1>Notes</h1>
-                    <Notes>
-                        <div>
-                            <Title>I am Title</Title>
-                            <Description>This is description here</Description>
-                        </div>
-                        <Button size='large'>Delete</Button>
-                        <Button type="dashed" size='large'>
-                            Edit
-                        </Button>
-                    </Notes>
-                </Container>
-            </div>
-        )
-    }
+  render() {
+    const search_array = this.props.search_data
+      ? this.props.search_data.organic_results.map((d) => {
+          return <SearchCard {...d} />
+        })
+      : []
+
+    return (
+      <Wrapper>
+        <Container>
+          <Search
+            type="text"
+            placeholder="Search..."
+            value={this.state.searchquery}
+            onChange={this.searchHandler}
+          />
+          <Button onClick={this.submitHandler}>Search</Button>
+        </Container>
+
+        <SearchContainer>
+          {this.props.search_data ? <h2>Search Result</h2> : <></>}
+
+          {search_array}
+        </SearchContainer>
+      </Wrapper>
+    )
+  }
 }
 
-const mapStateToProps = store =>{
-    console.log("store", store.modal)
-    return {
-        auth_data: store.authData.data,
-        allNotes: store.lists
-      };
+const mapStateToProps = (store) => {
+  console.log(store)
+  return {
+    search_data: store.searchResult,
   }
-  const mapDispatchToProps = dispatch => {
-    return {
-        // loginQuery: (data) => dispatch(CheckLogin(data))
-      };
-  }
+}
+const mapDispatchToProps = (dispatch) => {
+  return {}
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

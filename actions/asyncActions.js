@@ -1,86 +1,43 @@
-import {makeAsyncRequest} from "../constants/Request"
-import * as syncActions from "./syncActions"
-import Store from "../redux/store"
-import Axios from "axios";
+import * as syncActions from './syncActions'
+import Store from '../redux/store'
+import Axios from 'axios'
+import { GOOGLE_API } from '../config.json'
 
-export const CheckLogin =  async(req, res)=>{
-  console.log("query ",req)
-  await Axios.post("http://localhost:4200/api/user/login", req)
+export const SearchQuery = (req, res) => {
+  console.log('request', req)
+  Store.dispatch(syncActions.Spinner(true))
+  Axios.get(
+    `https://cors-anywhere.herokuapp.com/https://serpapi.com/search.json?engine=google&q=${req}&api_key=${GOOGLE_API}`,
+  )
     .then((response) => {
-      console.log(response);
-      // Cookies.set('token', `${response.data.token}`, { expires: 1 })
-      if (typeof window !== "undefined") {
-        console.log("in local")
-        localStorage.setItem("user", JSON.stringify(response))
-        Store.dispatch(syncActions.checkLogin(response.data));
-        }
+      console.log(response.data)
+      Store.dispatch(syncActions.Spinner(false))
+      Store.dispatch(syncActions.searchQuery(response.data))
     })
     .catch((err) => {
-      console.log(err);
-    });
+      Store.dispatch(syncActions.Spinner(false))
+      Store.dispatch(syncActions.Error(err))
+      console.log(err)
+    })
 }
 
-export const SignUp =  async(req, res)=>{
-  console.log("query ",req)
-  await Axios.post("http://localhost:4200/api/user/signup", req)
+export const NewsQuery = (req, res) => {
+  Store.dispatch(syncActions.Spinner(true))
+  Axios.get(
+    `https://cors-anywhere.herokuapp.com/https://serpapi.com/search.json?engine=google&q=latestnews&api_key=${GOOGLE_API}`,
+    {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+    },
+  )
     .then((response) => {
-      console.log(response)
-      alert("You are successfully Registered. Login to continue.")
-      Store.dispatch(syncActions.getUpscSubjectQuery(response.data));
+      Store.dispatch(syncActions.Spinner(false))
+      Store.dispatch(syncActions.NewsQuery(response.data))
     })
     .catch((err) => {
-      alert(err);
-      console.log(err);
-    });
-}
-
-export const LogOut = () =>{
-  if (typeof window !== "undefined") {
-    localStorage.removeItem('user');
-    Store.dispatch(syncActions.LogOut(false));
-  }
-}
-
-export const createNote = async(req, res) =>{
-  console.log("createNote ",req)
-  await Axios.post("http://localhost:4200/api/list/add-new", req)
-    .then((response) => {
-      console.log(response)
-      Store.dispatch(syncActions.createNote(response.data));
+      console.log(err)
+      Store.dispatch(syncActions.Spinner(false))
+      Store.dispatch(syncActions.Error(err))
     })
-    .catch((err) => {
-      console.log(err);
-    });
 }
-
-// get all list of a profile
-export const getAllLists = async(req, res) =>{
-  console.log("getalllist ", req)
-  await Axios.post("http://localhost:4200/api/list/getall-list", req)
-  .then((response) => {
-    console.log("GET ALL LIST ",response)
-    Store.dispatch(syncActions.getAllLists(response.data));
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-}
-
-
-export const checkAuthentication = () =>{
-  console.log("check Authentication");
-  if (typeof window !== "undefined") {
-    
-    var user= JSON.parse(localStorage.getItem("user"))
-    console.log("in local",user)
-    if(user){
-      Store.dispatch(syncActions.checkAuthentication(true));
-      Store.dispatch(syncActions.checkLogin(user));
-    }else{
-      Store.dispatch(syncActions.checkAuthentication(false));
-    }
-
-    }
-
-}
-
