@@ -1,5 +1,5 @@
 # classic_assignment_react
-
+The above project is in Next.js
 # To run:
 #npm install
 
