@@ -1,7 +1,7 @@
 # classic_assignment_react
 
-To run:
-# npm install
+# To run:
+#npm install
 
 #Google api keys in config.json
 
